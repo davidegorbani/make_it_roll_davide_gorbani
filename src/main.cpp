@@ -74,7 +74,9 @@ protected:
     Vector retrieveTarget3D(const Vector &cogL, const Vector &cogR)
     {
         // FILL IN THE CODE
-        return Vector(3);
+        Vector pos(3);
+        igaze->triangulate3DPoint(cogL, cogR, pos);
+        return pos;
     }
 
     /***************************************************/
@@ -87,7 +89,10 @@ protected:
     Vector computeHandOrientation()
     {
         // FILL IN THE CODE
-        return Vector(4);
+        Vector x(3);
+        Vector o(4);
+        iarm->getPose(x, o);
+        return o;
     }
 
     /***************************************************/
@@ -114,6 +119,12 @@ protected:
             igaze->blockEyes(5.0);
 
         // FILL IN THE CODE
+        // igaze->blockEyes();
+        Vector ang(3);
+        ang[0] = 0;
+        ang[1] = -45;
+        ang[2] = 5;
+        igaze->lookAtAbsAngles(ang);
     }
 
     /***************************************************/
@@ -185,7 +196,21 @@ public:
             return false;
         }
 
+        drvArm.view(iarm);
+
         // FILL IN THE CODE
+        Property optGaze;
+        optGaze.put("device","gazecontrollerclient");
+        optGaze.put("remote","/iKinGazeCtrl");
+        optGaze.put("local","/tracker/gaze");
+
+        if(!drvGaze.open(optGaze))
+        {
+            yError()<<"Unable to open the Gaze Controller";
+            return false;
+        }
+
+        drvGaze.view(igaze);
 
         imgLPortIn.open("/imgL:i");
         imgRPortIn.open("/imgR:i");
@@ -195,6 +220,7 @@ public:
 
         rpcPort.open("/service");
         attach(rpcPort);
+        updateModule();
 
         return true;
     }
@@ -244,6 +270,12 @@ public:
         {
             // FILL IN THE CODE
             bool go=false;   // you need to properly handle this flag
+            Vector currAng(3);
+            igaze->getAngles(currAng);
+            if(currAng[1] < 0)
+            {
+                go = true;
+            }
 
             bool rolled=false;
             if (go || !simulation)
