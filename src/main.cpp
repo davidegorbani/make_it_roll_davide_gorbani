@@ -313,13 +313,10 @@ public:
         else if (cmd=="make_it_roll")
         {
             // FILL IN THE CODE
-            bool go=true;   // you need to properly handle this flag
-            // Vector currAng(3);
-            // igaze->getAngles(currAng);
-            // if(currAng[1] < 0)
-            // {
-            //     go = true;
-            // }
+            bool go=false;   // you need to properly handle this flag
+            if(okL && okR){
+                go = true;
+            }
 
             bool rolled=false;
             if (go || !simulation)
