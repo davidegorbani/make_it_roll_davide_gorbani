@@ -33,6 +33,7 @@ protected:
 
     mutex mtx;
     Vector cogL,cogR;
+    Vector x0, o0;
     bool okL,okR;
 
     bool simulation;
@@ -147,6 +148,7 @@ protected:
 
         // FILL IN THE CODE
         Vector ang(3);
+        iarm->getPose(x0, o0);
         ang[0] = 0;
         ang[1] = -45;
         ang[2] = 5;
@@ -191,12 +193,17 @@ protected:
     void home()
     {
         // FILL IN THE CODE
-
+        iarm->goToPose(x0, o0);
         bool done = false;
         while(!done){
             iarm->checkMotionDone(&done);
             Time::delay(0.1);
         }
+        Vector ang(3);
+        ang[0] = 0;
+        ang[1] = 0;
+        ang[2] = 5;
+        igaze->lookAtAbsAngles(ang);
     }
 
 public:
