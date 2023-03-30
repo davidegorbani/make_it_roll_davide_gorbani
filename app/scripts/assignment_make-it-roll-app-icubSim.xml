@@ -36,7 +36,7 @@
   </connection>
 
   <connection>
-      <from>/icubSim/cam/right/rgbImage:o</from>
+      <from>/icubSim/cam/right</from>
       <to>/imgR:i</to>
       <protocol>fast_tcp</protocol>
   </connection>

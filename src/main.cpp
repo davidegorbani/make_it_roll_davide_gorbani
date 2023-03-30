@@ -83,6 +83,7 @@ protected:
     void fixate(const Vector &x)
     {
         // FILL IN THE CODE
+        igaze->lookAtFixationPoint(x);
     }
 
     /***************************************************/
@@ -99,12 +100,38 @@ protected:
     void approachTargetWithHand(const Vector &x, const Vector &o)
     {
         // FILL IN THE CODE
+        Vector newDof, curDof;
+        iarm->getDOF(curDof);
+        newDof = curDof;
+        newDof[0] = 1;
+        newDof[1] = 1;
+        newDof[2] = 1;
+        iarm->setDOF(newDof, curDof);
+        Vector xd;
+        xd = x;
+        xd[0] = x[0] + 0.05;
+        xd[1] = x[1] + 0.05;
+        xd[2] = x[2] + 0.05;
+        iarm->goToPose(xd, o);
+        Time::delay(5);
     }
 
     /***************************************************/
     void roll(const Vector &x, const Vector &o)
     {
         // FILL IN THE CODE
+        Vector xd;
+        xd = x;
+        xd[0] = x[0] + 0.05;
+        xd[1] = x[1] - 0.05;
+        xd[2] = x[2] + 0.05;
+        iarm->goToPose(xd, o);
+        iarm->setTrajTime(0.5);
+        bool done = false;
+        while(!done){
+            iarm->checkMotionDone(&done);
+            Time::delay(0.1);
+        }
     }
 
     /***************************************************/
@@ -119,12 +146,16 @@ protected:
             igaze->blockEyes(5.0);
 
         // FILL IN THE CODE
-        // igaze->blockEyes();
         Vector ang(3);
         ang[0] = 0;
         ang[1] = -45;
         ang[2] = 5;
         igaze->lookAtAbsAngles(ang);
+        bool done = false;
+        while(!done){
+            iarm->checkMotionDone(&done);
+            Time::delay(0.1);
+        }
     }
 
     /***************************************************/
@@ -160,6 +191,12 @@ protected:
     void home()
     {
         // FILL IN THE CODE
+
+        bool done = false;
+        while(!done){
+            iarm->checkMotionDone(&done);
+            Time::delay(0.1);
+        }
     }
 
 public:
@@ -269,13 +306,13 @@ public:
         else if (cmd=="make_it_roll")
         {
             // FILL IN THE CODE
-            bool go=false;   // you need to properly handle this flag
-            Vector currAng(3);
-            igaze->getAngles(currAng);
-            if(currAng[1] < 0)
-            {
-                go = true;
-            }
+            bool go=true;   // you need to properly handle this flag
+            // Vector currAng(3);
+            // igaze->getAngles(currAng);
+            // if(currAng[1] < 0)
+            // {
+            //     go = true;
+            // }
 
             bool rolled=false;
             if (go || !simulation)
